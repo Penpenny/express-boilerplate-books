@@ -1,4 +1,4 @@
-const { books } = require("../controllers/book.controller.js");
+const books  = require("../controllers/book.controller.js");
 module.exports = function(app) {
 
     // Setting up the books api
