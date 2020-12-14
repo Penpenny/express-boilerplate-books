@@ -1,46 +1,51 @@
-const db = require("./modules/books/models");
-const bookdb = db.books;
-const Key = mongoose.model('Key');
+const { request } = require('express');
+const mongoose= require('mongoose');
+const books= mongoose.model('Book');
+
 
   // Save book in the database
-  async function create(book) {
+  async function create(req,res) {
     try {
-        const key = new Key();
-        key.key = chance.guid();
-        key.book = book;
-        const result = await key.save(book);
-        return result.key;
+        const book= new books();
+        book.name= req.body.name;
+        book.author=req.body.author;
+        book.year=req.body.year;
+        const result=await book.save();
+        res.send(result);
     } catch (e) {
         throw new errors.InvalidData(e);
     }
 }
 
-
 // Retrieve one books from the database.
-async function read(book) {
+async function read(req, res) {
   try {
-      const result = await Key.findOne({ book });
-      if (!result) throw new errors.InvalidData();
-      return result.key;
+      const name = req.query.name;
+      var condition = name ? { name: { $regex: new RegExp(name), $options: "i" } } : {};
+      const result= await books.find(condition);
+      res.send(result);
   } catch (e) {
       throw new errors.InvalidData(e);
   }
 }
+
 // Update one books from the database.
-async function update(book) {
+
+async function update(req, res) {
   try {
-      const result = await Key.findOneAndUpdate({ book }, { $set: { key: chance.guid() } }, { new: true });
-      return result.key;
+    const id = req.params.id;
+    books.findByIdAndUpdate(id, req.body, { useFindAndModify: false })
+    await res.send({ message: "book was updated successfully." });
   } catch (e) {
       throw new errors.InvalidData(e);
   }
 }
 
 // Delete all books from the database.
-async function remove(book) {
+async function remove(req, res) {
   try {
-      const result = await Key.findOneAndRemove({ book });
-      return result.key;
+      books.deleteMany({})
+      await res.send(`Books were deleted successfully!`);
   } catch (e) {
       throw new errors.InvalidData(e);
   }
@@ -52,3 +57,4 @@ module.exports = {
   update,
   remove,
 };
+
