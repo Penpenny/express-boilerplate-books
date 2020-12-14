@@ -2,8 +2,8 @@ const books  = require("../controllers/book.controller.js");
 module.exports = function(app) {
 
     // Setting up the books api
-    app.route('/create', controller.create);
-    app.route('/read', controller.read);
-    app.route('/update', controller.update);
-    app.route('/remove/:book', controller.remove);
+    app.route('/create').post( books.create);
+    app.route('/read').get(books.read);
+    app.route('/update').put(books.update);
+    app.route('/remove').delete( books.remove);
 };
